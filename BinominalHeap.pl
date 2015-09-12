@@ -40,7 +40,7 @@ balanceBH([Small,Big|Rest],Res):-
 	Small = node(KeyS,nil,TailS), 
 	Big = node(KeyB,nil,TailB), 
 	keyS<keyB,
-	X = node(keyS,nil,[node(keyB,X,TailB)|Tail1]),
+	X = node(keyS,nil,[node(keyB,X,TailB)|TailS]),
 	balanceBH([X|Rest], Res).
 
 
