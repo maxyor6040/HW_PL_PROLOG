@@ -58,7 +58,8 @@ add(What,BeforeBH,AfterBH):-
 	addTree(node(What,[]),BeforeBH,AfterBH).
 
 /*fetchMin*/
-fetchMin(Into,[node(Into,_)],[]).
+fetchMin(Into,[node(Into,CurrentTreeChildren)],CurrentTreeChildren).
+	
 
 fetchMin(CurrentKey,[node(CurrentKey,CurrentTreeChildren),SecondTree|RestOfBH],AfterBH):-
 	fetchMin(MinInRestOfBH,[SecondTree|RestOfBH],_),
