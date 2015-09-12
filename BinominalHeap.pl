@@ -1,5 +1,4 @@
 /* Binomial tree node (root node represents binomial tree) */
-node(nil).
 node(Key,ChildrenNodeList).
 
 /* emptyBH */
