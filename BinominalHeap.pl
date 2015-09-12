@@ -28,19 +28,19 @@ balanceBH([Big,Small|Rest],Res):-
 
 balanceBH([Big,Small|Rest],Res):- 
 	depth(Small,D),depth(Big,D),
-	Small = node(Key1,nil,Tail1), 
-	Big = node(Key2,nil,Tail2), 
-	key1<key2,
-	X = node(key1,nil,[node(key2,X,Tail2)|Tail1]),
+	Small = node(KeyS,nil,TailS), 
+	Big = node(KeyB,nil,TailB), 
+	keyS<=keyB,
+	X = node(keyS,nil,[node(keyB,X,TailB)|TailS]),
 	balanceBH([X|Rest], Res).
 
 
 balanceBH([Small,Big|Rest],Res):- 
 	depth(Small,D),depth(Big,D),
-	Small = node(Key1,nil,Tail1), 
-	Big = node(Key2,nil,Tail2), 
-	key1<key2,
-	X = node(key1,nil,[node(key2,X,Tail2)|Tail1]),
+	Small = node(KeyS,nil,TailS), 
+	Big = node(KeyB,nil,TailB), 
+	keyS<keyB,
+	X = node(keyS,nil,[node(keyB,X,TailB)|Tail1]),
 	balanceBH([X|Rest], Res).
 
 
