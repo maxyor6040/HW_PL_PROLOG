@@ -1,63 +1,79 @@
-
-
-/* Binomial tree node */
+/* Binomial tree node (root node represents binomial tree) */
 node(nil).
-node(Key,FatherNode,ChildrenNodeList).
+node(Key,ChildrenNodeList).
 
-/* Binomial heap */
-bh([]).
-bh([node(_,_,_)|Rest]).
+/* emptyBH */
 emptyBH([]).
 
+/*mergeBH*/
+mergeBH([],BH2,BH2).
+
+mergeBH([Head|Tail],BH2,MegrgedBH):-
+	addTree(Head,BH2,NewBH2),
+	mergeBH(Tail,NewBH2,MegrgedBH).
+
+/*AddTree*/
+addTree(Tree,[],[Tree]).
+
+addTree(Tree,[FirstTree|Rest],NewBH):-
+	depth(Tree,TreeDepth),
+	depth(FirstTree,FirstTreeDepth),
+	TreeDepth < FirstTreeDepth,
+	NewBH = [Tree,FirstTree|Rest].
+
+addTree(Tree,[FirstTree|Rest],NewBH):-
+	depth(Tree,TreeDepth),
+	depth(FirstTree,FirstTreeDepth),
+	TreeDepth > FirstTreeDepth,
+	addTree(Tree,Rest,BHWithTree),
+	NewBH = [FirstTree|BHWithTree].
+
+addTree(Tree,[FirstTree|Rest],NewBH):-
+	depth(Tree,TreeDepth),
+	depth(FirstTree,FirstTreeDepth),
+	TreeDepth =:= FirstTreeDepth,
+	Tree = node(TreeKey,TreeChildren), 
+	FirstTree = node(FirstTreeKey,FirstTreeChildren), 
+	TreeKey=<FirstTreeKey,
+	addTree(node(TreeKey,[node(FirstTreeKey,FirstTreeChildren)|TreeChildren]),Rest,NewBH).
+
+addTree(Tree,[FirstTree|Rest],NewBH):-
+	depth(Tree,TreeDepth),
+	depth(FirstTree,FirstTreeDepth),
+	TreeDepth =:= FirstTreeDepth,
+	Tree = node(TreeKey,TreeChildren), 
+	FirstTree = node(FirstTreeKey,FirstTreeChildren), 
+	TreeKey>FirstTreeKey,
+	addTree(node(FirstTreeKey,[node(TreeKey,TreeChildren)|FirstTreeChildren]),Rest,NewBH).
+
 /* tree depth calculation */
-depth(node(_,_,[]),1).
-depth(node(_,_,[LeftChild|Rest]),Val):- depth(LeftChild,LeftChildDepth), Val is 1+LeftChildDepth.
+depth(node(_,[]),1).
 
-/* balancing a BH  - first 'arg' is input and second is output*/
-balanceBH([],[]).
-
-balanceBH([node(A,B,C)],[node(A,B,C)]).
-
-balanceBH([Big,Small|Rest],Res):- 
-	depth(Big,Db),
-	depth(Small,Ds),
-	Ds =\= Db,
-	balanceBH([Small|Rest],Temp) ,
-	Res = [Big|Temp].
-	
-
-balanceBH([Big,Small|Rest],Res):- 
-	depth(Small,D),depth(Big,D),
-	Small = node(KeyS,nil,TailS), 
-	Big = node(KeyB,nil,TailB), 
-	keyS<=keyB,
-	X = node(keyS,nil,[node(keyB,X,TailB)|TailS]),
-	balanceBH([X|Rest], Res).
-
-
-balanceBH([Small,Big|Rest],Res):- 
-	depth(Small,D),depth(Big,D),
-	Small = node(KeyS,nil,TailS), 
-	Big = node(KeyB,nil,TailB), 
-	keyS<keyB,
-	X = node(keyS,nil,[node(keyB,X,TailB)|TailS]),
-	balanceBH([X|Rest], Res).
-
+depth(node(_,[LeftChild|Rest]),Val):- depth(LeftChild,LeftChildDepth), Val is 1+LeftChildDepth.
 
 /* add */
-add(What, [], [node(What,nil,[])]).
+add(What, [], [node(What,[])]).
+
 add(What, [First|Rest], AfterBH):- 
 	depth(First)>1,
-	AfterBH = [node(What,nil,[]),First|Rest].
+	AfterBH = [node(What,[]),First|Rest].
+
 add(What, [First|Rest], AfterBH):- 
 	depth(First)=:=1,
-	balanceBH([node(What,nil,[]),First|Rest],AfterBH).
+	addTree(node(What,[]),[First|Rest],AfterBH).
 
+/*fetchMin*/
+fetchMin(Into,[node(Into,[])],[]).
 
+fetchMin(CurrentKey,[node(CurrentKey,CurrentTreeChildren),SecondTree|RestOfBH],AfterBH):-
+	fetchMin(MinInRestOfBH,[SecondTree|RestOfBH],_),
+	MinInRestOfBH>CurrentKey,
+	mergeBH(CurrentTreeChildren, [SecondTree|RestOfBH], AfterBH).
 
-
-
-
+fetchMin(Into,[CurrentTree,SecondTree|Rest],[CurrentTree|AfterBH]):-
+	CurrentTree = node(CurrentKey,_),
+	fetchMin(MinInRestOfBH,[SecondTree|RestOfBH],AfterBH),
+	MinInRestOfBH=<CurrentKey.
 
 /**
 * emptyBH(X),add(2,X,Y),add(3,Y,Z),add(1,Z,A).
