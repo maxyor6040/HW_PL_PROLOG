@@ -7,6 +7,7 @@ emptyBH([]).
 
 /*mergeBH*/
 mergeBH([],BH2,BH2).
+mergeBH(BH1,[],BH1).
 
 mergeBH([Head|Tail],BH2,MegrgedBH):-
 	addTree(Head,BH2,NewBH2),
@@ -54,28 +55,18 @@ depth(node(_,[LeftChild|Rest]),Val):- depth(LeftChild,LeftChildDepth), Val is 1+
 /* add */
 add(What, [], [node(What,[])]).
 
-add(What, [First|Rest], AfterBH):- 
-	depth(First)>1,
-	AfterBH = [node(What,[]),First|Rest].
-
-add(What, [First|Rest], AfterBH):- 
-	depth(First)=:=1,
-	addTree(node(What,[]),[First|Rest],AfterBH).
+add(What,BeforeBH,AfterBH):-
+	addTree(node(What,[]),BeforeBH,AfterBH).
 
 /*fetchMin*/
-fetchMin(Into,[node(Into,[])],[]).
+fetchMin(Into,[node(Into,_)],[]).
 
 fetchMin(CurrentKey,[node(CurrentKey,CurrentTreeChildren),SecondTree|RestOfBH],AfterBH):-
 	fetchMin(MinInRestOfBH,[SecondTree|RestOfBH],_),
 	MinInRestOfBH>CurrentKey,
 	mergeBH(CurrentTreeChildren, [SecondTree|RestOfBH], AfterBH).
 
-fetchMin(Into,[CurrentTree,SecondTree|Rest],[CurrentTree|AfterBH]):-
+fetchMin(MinInRestOfBH,[CurrentTree,SecondTree|RestOfBH],[CurrentTree|AfterBH]):-
 	CurrentTree = node(CurrentKey,_),
 	fetchMin(MinInRestOfBH,[SecondTree|RestOfBH],AfterBH),
 	MinInRestOfBH=<CurrentKey.
-
-/**
-* emptyBH(X),add(2,X,Y),add(3,Y,Z),add(1,Z,A).
-* 
-*/
